@@ -1,47 +1,16 @@
-"""foodgram URL Configuration
+from django.urls import path
+from . import views
 
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/3.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-
-from django.conf import settings
-from django.conf.urls import handler404, handler500
-from django.conf.urls.static import static
-from django.contrib import admin
-from django.contrib.flatpages import views
-from django.urls import include, path
-
-# handler404 = 'recipes.views.page_not_found'  # noqa
-# handler500 = 'recipes.views.server_error'  # noqa
 
 urlpatterns = [
-    # path('', include('recipes.urls')),
-    path('accounts/', include('users.urls')),
-    path('admin/', admin.site.urls),
+    path('', views.IndexView.as_view(), name='index'),
+    path('new_recipe', views.RecipeCreateView.as_view(), name='new_recipe'),
+    path('<username>/', views.ProfileView.as_view(), name='profile'),
+    path('recipe/<int:pk>/', views.RecipeDetailView.as_view(), name='recipe_page'),
+    path('recipe/<int:pk>/edit', views.RecipeEditView.as_view(), name='edit_recipe'),
+    path('recipe/<int:pk>/delete/', views.RecipeDeleteView.as_view(), name='delete_recipe'),
+    path('favorite_recipes', views.FavoriteView.as_view(), name='favorite_recipes'),
+    path('card', views.CardView.as_view(), name='card'),
+    path('my_subscriptions', views.FollowView.as_view(), name='my_subscriptions'),
+    path('card/download_card', views.download_card, name='download_card'),
 ]
-
-urlpatterns += [
-    # path("about/about-author/", views.flatpage,
-    #      {"url": "/about-author/"}, name="about-author"),
-    # path("about/about-spec/", views.flatpage,
-    #      {"url": "/about-spec/"}, name="about-spec"),
-]
-
-if settings.DEBUG:
-    import debug_toolbar
-
-    urlpatterns += (path("__debug__/", include(debug_toolbar.urls)),)
-    urlpatterns += static(settings.MEDIA_URL,
-                          document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL,
-                          document_root=settings.STATIC_ROOT)

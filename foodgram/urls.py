@@ -26,7 +26,7 @@ from django.urls import include, path
 
 urlpatterns = [
     # path('', include('recipes.urls')),
-    # path('accounts/', include('users.urls')),
+    path('accounts/', include('users.urls')),
     path('admin/', admin.site.urls),
 ]
 
@@ -36,12 +36,12 @@ urlpatterns += [
     # path("about/about-spec/", views.flatpage,
     #      {"url": "/about-spec/"}, name="about-spec"),
 ]
-
-if settings.DEBUG:
-    import debug_toolbar
-
-    urlpatterns += (path("__debug__/", include(debug_toolbar.urls)),)
-    urlpatterns += static(settings.MEDIA_URL,
-                          document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL,
-                          document_root=settings.STATIC_ROOT)
+#
+# if settings.DEBUG:
+#     import debug_toolbar
+#
+#     urlpatterns += (path("__debug__/", include(debug_toolbar.urls)),)
+#     urlpatterns += static(settings.MEDIA_URL,
+#                           document_root=settings.MEDIA_ROOT)
+#     urlpatterns += static(settings.STATIC_URL,
+#                           document_root=settings.STATIC_ROOT)

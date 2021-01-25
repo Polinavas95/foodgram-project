@@ -9,24 +9,13 @@ class RecipeObjectMixin(object):
         context.update({'all_tags': Tag.objects.all()})
 
         if self.request.user.is_authenticated:
-            context['following_list'] = FollowRecipe.objects.select_related(
-                'user', 'recipe'
-            ).filter(
-                user=self.request.user
-            ).values_list(
-                'recipe__id', flat=True
-            ).distinct()
+            context['following_list'] = FollowRecipe.objects.select_related('user', 'recipe').filter(
+                user=self.request.user).values_list('recipe__id', flat=True).distinct()
 
-            context['card_list'] = ShoppingList.objects.select_related(
-                'user', 'recipe'
-            ).filter(
-                user=self.request.user
-            ).values_list(
-                'recipe__id', flat=True
-            ).distinct()
+            context['card_list'] = ShoppingList.objects.select_related('user', 'recipe').filter(
+                user=self.request.user).values_list('recipe__id', flat=True).distinct()
 
-            context['followers'] = self.request.user.follower.all().values_list(
-                'author__id', flat=True
+            context['followers'] = self.request.user.follower.all().values_list('author__id', flat=True
             ).distinct()
 
         return context
