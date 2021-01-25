@@ -7,7 +7,7 @@ from users.forms import CreationForm
 User = get_user_model()
 
 
-def signup(request):
+def reg(request):
     form = CreationForm(request.POST)
     if form.is_valid():
         form.save()
