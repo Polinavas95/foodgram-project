@@ -16,4 +16,4 @@ def reg(request):
         user = authenticate(username=username, password=password)
         login(request, user)
         return redirect('index')
-    return render(request, 'signup.html', {'form': form})
+    return render(request, 'reg.html', {'form': form})
