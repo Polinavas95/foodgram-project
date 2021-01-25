@@ -52,7 +52,7 @@ class RecipeDetailView(RecipeObjectMixin, DetailView):
         # показывать разные шаблоны в зависимости от залогинен ли пользователь
         if self.request.user.is_authenticated:
             return ['recipePage.html']
-        return ['customPage.html']
+        return ['singlePage.html']
 
 
 class FavoriteView(LoginRequiredMixin, RecipeObjectMixin, ListView):
