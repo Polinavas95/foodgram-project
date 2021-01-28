@@ -1,13 +1,17 @@
-{% url 'index' as index %}
+
+{% block styles %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'pages/index.css' %}">
+{% endblock %}
 <nav class="nav">
     <div class="nav__container container">
         <ul class="nav__items list">
-            <li class="nav__item {% if request.path == index %} nav__item_active {% endif %}"><a href="{% url 'index' %}"
-                      class="nav__link link">Рецепты</a></li>
+            <li class="nav__item {% if request.path == index %} nav__item_active {% endif %}"><a href="{% url 'recipes:index' %}"
+                      class="nav__link link">Рецепты 11111111</a></li>
         </ul>
         <ul class="nav__items list">
             <li class="nav__item"><a href="{% url 'login' %}" class="nav__link link">Войти</a></li>
-            <li class="nav__item"><a href="{% url 'reg' %}" class="button button_style_blue">Создать аккаунт</a></li>
+            <li class="nav__item"><a href="{% url 'users:registration' %}" class="button button_style_blue">Создать аккаунт</a></li>
         </ul>
     </div>
 </nav>

@@ -1,115 +1,172 @@
+import itertools
+
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.utils.safestring import mark_safe
+from django.utils.text import slugify
+from django.core.validators import MinValueValidator
+
+from .validators import validate_file_size
 
 User = get_user_model()
 
 
-class Tag(models.Model):
-    name = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True, max_length=100, blank=True, null=True)
-    color = models.CharField(max_length=15, blank=True, null=True)
-
-    def __str__(self):
-        return self.slug
+class Recipe(models.Model):
+    '''
+    Модель рецептов пользователя
+    '''
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='recipe_author',
+        verbose_name='автор рецепта',
+    )
+    title = models.CharField('название рецепта', max_length=256, blank=False)
+    duration = models.PositiveSmallIntegerField('время приготовления')
+    text = models.TextField('текст рецепта', blank=False)
+    pub_date = models.DateTimeField(
+        'дата публикации', auto_now_add=True, db_index=True
+    )
+    image = models.ImageField(
+        upload_to='recipe_images/',
+        validators=[validate_file_size],
+        verbose_name='изображение',
+    )
+    slug = models.SlugField(
+        'уникальное имя', default='', editable=False, max_length=32
+    )
+    ingredient = models.ManyToManyField(
+        'Ingredient',
+        related_name='recipe_ingredient',
+        through='IngredientAmount',
+        verbose_name='ингредиент',
+    )
 
     class Meta:
-        verbose_name = 'Тег'
-        verbose_name_plural = 'Теги'
+        ordering = ('-pub_date',)
+        verbose_name = 'рецепт'
+        verbose_name_plural = 'рецепты'
 
+    def _generate_slug(self):
+        max_length = self._meta.get_field('slug').max_length
+        value = self.title
+        slug_candidate = slug_original = slugify(value, allow_unicode=True)[
+            :max_length
+        ]
+        for i in itertools.count(1):
+            if not Recipe.objects.filter(slug=slug_candidate).exists():
+                break
+            slug_candidate = '{}-{}'.format(slug_original, i)
 
-class Ingredient(models.Model):
-    title = models.CharField(max_length=150, null=True, blank=True)
-    quantity = models.CharField(max_length=20, null=True, blank=True)
+        self.slug = slug_candidate
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self._generate_slug()
+
+        super().save(*args, **kwargs)
+
+    def image_img(self):
+        if self.image:
+            return mark_safe( f'<img width="90" height="50" src="{self.image.url}" />')
+        return 'Без изображения'
 
     def __str__(self):
         return self.title
 
+    image_img.short_description = 'изображение'
+
+
+class Ingredient(models.Model):
+    ''''
+    Модель ингредиентов в рецепте
+    '''
+    title = models.CharField(
+        'название ингредиента', max_length=128, db_index=True
+    )
+    dimension = models.CharField('единицы измерения', max_length=16)
+
     class Meta:
-        verbose_name = 'Ингридиент'
-        verbose_name_plural = 'Ингридиенты'
-
-
-class Recipe(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipes')
-    name = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='recipes/', blank=True, null=True)
-    description = models.TextField()
-    time_for_preparing = models.IntegerField(default=0)
-    ingredients = models.ManyToManyField(Ingredient, through='RecipeIngredient')
-    tags = models.ManyToManyField(Tag, related_name='recipes')
-    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'dimension'], name='unique_ingredients'
+            )]
+        verbose_name = 'ингредиент'
+        verbose_name_plural = 'ингредиенты'
+        ordering = ('title',)
 
     def __str__(self):
-        return self.name
+        return f'{self.title}, {self.dimension}'
+
+
+class IngredientAmount(models.Model):
+    '''
+    Отображение кол-ва ингредиента в конкретном рецепте.
+    '''
+    ingredient = models.ForeignKey(
+        Ingredient, on_delete=models.CASCADE, verbose_name='ингредиент'
+    )
+    recipe = models.ForeignKey(
+        Recipe, on_delete=models.CASCADE, related_name='recipe_amount',
+    )
+    amount = models.DecimalField('количество', max_digits=6, decimal_places=1, validators=[MinValueValidator(1)])
 
     class Meta:
-        verbose_name = 'Рецепт'
-        verbose_name_plural = 'Рецепты'
-
-    @property
-    def favorite_amount(self):
-        return self.recipe_followers.count()
-
-    @property
-    def description_as_list(self):
-        return self.description.split('\n')
-
-
-class RecipeIngredient(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='recipe_ingredients')
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name='recipes')
-    amount = models.IntegerField()
+        verbose_name = 'кол-во ингредиента'
+        verbose_name_plural = 'кол-во ингредиентов'
 
     def __str__(self):
-        return f'{self.ingredient.title} - {self.amount} ({self.ingredient.quantity})'
+        return f'Из рецепта "{self.recipe}"'
+
+
+class Tag(models.Model):
+
+    TAG_CHOICES = (
+        ('Завтрак', 'Завтрак'),
+        ('Обед', 'Обед'),
+        ('Ужин', 'Ужин'),
+        ('Перекус', 'Перекус'),
+        ('Десерт', 'Десерт'),
+    )
+    title = models.CharField('тег', max_length=10, choices=TAG_CHOICES)
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        verbose_name='рецепт',
+        related_name='recipe_tag',
+    )
+    slug = models.SlugField(
+        'уникальное имя тега', default='', editable=False, max_length=3
+    )
+    color = models.CharField(
+        'цвет тега',
+        max_length=10,
+        default='',
+        editable=False,
+    )
 
     class Meta:
-        verbose_name = 'Ингридиент рецепта'
-        verbose_name_plural = 'Ингридиенты рецепта'
+        verbose_name = 'тег'
+        verbose_name_plural = 'теги'
 
+    def _generate_slug_and_colour(self):
+        value = self.title
+        if value == 'Ужин':
+            self.slug = 's'
+            self.color = 'purple'
+        elif value == 'Обед':
+            self.slug = 'd'
+            self.color = 'green'
+        elif value == 'Перекус':
+            self.slug = 'l'
+            self.color = 'g'
+        elif value == 'Десерт':
+            self.slug = 'des'
+            self.color = 'p'
 
-class ShoppingList(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_shopping_list')
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='shopping_list')
+    def save(self, *args, **kwargs):
+        self._generate_slug_and_colour()
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'Пользователь: {self.user} добавил в список покупок ингридиенты из рецепта "{self.recipe}"'
-
-    class Meta:
-        verbose_name = 'Список покупок'
-        verbose_name_plural = 'Списки покупок'
-
-
-class FollowUser(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follower')
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
-
-    def __str__(self):
-        return f'Пользователь: {self.user} подписался на "{self.author}"'
-
-    class Meta:
-        verbose_name = 'Подписчик'
-        verbose_name_plural = 'Подписчики'
-
-
-class FollowRecipe(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following_recipes')
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='recipe_followers')
-
-    def __str__(self):
-        return f'Пользователь: {self.user} добавил в избранное рецепт "{self.recipe}"'
-
-    class Meta:
-        verbose_name = 'Избранный рецепт'
-        verbose_name_plural = 'Избранные рецепты'
-
-
-def is_following(self, user):
-    """
-    Метод для поиска пользователя среди подписчиков
-    """
-    return self.following.filter(user=user).exists()
-
-
-# Добавление метода для модели User на проверку наличия его среди подписчиков
-User.add_to_class('is_following', is_following)
+        return self.title

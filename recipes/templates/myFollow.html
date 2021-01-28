@@ -1,25 +1,19 @@
-{% url 'index' as index %}
-{% url 'my_subscriptions' as my_subscriptions %}
-{% url 'new_recipe' as new_recipe %}
-{% url 'favorite_recipes' as favorite_recipes %}
-{% url 'card' as card %}
-
 <nav class="nav">
     <div class="nav__container container">
         <ul class="nav__items list">
             <li class="nav__item {% if request.path == index %} nav__item_active {% endif %}">
-                <a href="{% url 'index' %}" class="nav__link link">Рецепты</a></li>
-            <li class="nav__item {% if request.path == my_subscriptions %} nav__item_active {% endif %}">
-                <a href="{% url 'my_subscriptions' %}" class="nav__link link">Мои подписки</a></li>
+                <a href="{% url 'recipes:index' %}" class="nav__link link">Рецепты</a></li>
+            <li class="nav__item {% if request.path == subscriptions %} nav__item_active {% endif %}">
+                <a href="{% url 'recipes:subscriptions' %}" class="nav__link link">Мои подписки</a></li>
 
             <li class="nav__item {% if request.path == new_recipe %} nav__item_active {% endif %} ">
-                <a href="{% url 'new_recipe' %}" class="nav__link link">Создать рецепт</a></li>
+                <a href="{% url 'recipes:new_recipe' %}" class="nav__link link">Создать рецепт</a></li>
 
-            <li class="nav__item {% if request.path == favorite_recipes %} nav__item_active {% endif %}">
-                <a href="{% url 'favorite_recipes' %}" class="nav__link link">Избранное</a></li>
+            <li class="nav__item {% if request.path == favorites %} nav__item_active {% endif %}">
+                <a href="{% url 'recipes:favorites' %}" class="nav__link link">Избранное</a></li>
 
             <li class="nav__item {% if request.path == card %} nav__item_active {% endif %}">
-                <a href="{% url 'card' %}" class="nav__link link">Список покупок</a>
+                <a href="{% url 'recipes:card' %}" class="nav__link link">Список покупок</a>
                 <span class="badge badge_style_blue nav__badge" id="counter">{{ user.user_shopping_list.count }}</span></li>
 
         </ul>

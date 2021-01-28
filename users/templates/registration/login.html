@@ -1,53 +1,45 @@
-<!doctype html>
+{% extends "base.html" %}
 {% load static %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Войти на сайт</title>
-    <link rel="stylesheet" href="{% static 'pages/form.css'%}">
-</head>
-<body class="body">
-<header class="header">
-    {% include 'notAuthNav.html' %}
-</header>
-<main class="main container">
+{% block title %}Войти на сайт{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'pages/form.css' %}">
+{% endblock %}
+{% block header %}{%include 'recipes:NotAuthNav.html' %}{% endblock %}
+{% block content %}
     <div class="main__header">
-        <h1 class="main__title">Войти на сайт</h1>
+        <h1 class="main__title">Войти</h1>
     </div>
     <div class="form-container">
-        <form class="form" method="post" action="{% url 'login' %}">
+        <form class="form" method="post" action="{% url 'users:login' %}">
             {% csrf_token %}
+            <div class="form__field-group">
+                {% if form.errors %}
+                    <span class="form__error">Имя пользоваетеля и пароль не совпадают. Введите правильные данные.</span>
+                {% endif %}
+            </div>
+            {% if next %}
+            <div class="form__field-group">
+                <span class="form__error">Вы обратились к странице, доступ к которой возможен только для залогиненных пользователей.<br>
+                Пожалуйста, авторизуйтесь.</span>
+            </div>
+            {% endif %}
+            {% for field in form %}
             <div class="form__group">
-                <label for="id_username" class="form__label">Логин</label>
+                <label for="{{ field.id_for_label }}"
+                       class="form__label">{{ field.label }}</label>
                 <div class="form__field-group">
-                    <input type="text" name="username" id="id_username" class="form__input">
-                    <span class="form__error">{{ form.username.errors }}</span>
+                    <input type="{{ field.widget_type }}"
+                           name="{{ field.html_name }}"
+                           id="{{ field.id_for_label }}"
+                           class="form__input"
+                           required>
                 </div>
             </div>
-
-            <div class="form__group">
-                <label for="id_password" class="form__label">Пароль</label>
-                <div class="form__field-group">
-                    <input type="password" name="password" id="id_password" class="form__input">
-                    <span class="form__error">
-                        {% if form.errors %}
-                            <ul class="errorlist">
-                                <li>Имя пользователя и пароль не совпадают.</li>
-                            </ul>
-                         {% endif %}
-                    </span>
-                </div>
-            </div>
+            {% endfor %}
             <div class="form__footer">
                 <button class="button button_style_blue">Войти</button>
                 <a class="form__forgot-link" href="{% url 'password_reset' %}">Забыли пароль?</a>
             </div>
         </form>
     </div>
-</main>
-{% include 'footer.html' %}
-</body>
-</html>
+{% endblock %}

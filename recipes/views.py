@@ -1,150 +1,176 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 from django.db.models import Sum
 from django.http import HttpResponse
-from django.shortcuts import render, get_object_or_404
-from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.csrf import requires_csrf_token
 
+from users.models import User
+
+from .common import filter_tag, get_tag, save_recipe
 from .forms import RecipeForm
-from .mixins import RecipeObjectMixin, AuthorRequiredMixin
-from .models import Recipe, User, ShoppingList, FollowUser, FollowRecipe
+from .models import Recipe
 
 
-class IndexView(RecipeObjectMixin, ListView):
-    queryset = Recipe.objects.select_related('author').prefetch_related('tags')
-    context_object_name = 'recipes'
-    ordering = ['-pub_date']
-    paginate_by = 6
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        filters = self.request.GET.getlist('filters')
-
-        if filters:
-            qs = qs.filter(tags__slug__in=filters).distinct()
-        return qs
-
-    def get_template_names(self):
-        if self.request.user.is_authenticated:
-            return ['indexAuth .html']
-        return ['indexNotAuth.html']
-
-
-class RecipeCreateView(LoginRequiredMixin, CreateView):
-    form_class = RecipeForm
-    template_name = 'formRecipe.html'
-
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        # Показывает страницу только что созданного рецепта
-        return reverse_lazy('recipe_page', kwargs={'pk': self.object.pk})
-
-
-class RecipeDetailView(RecipeObjectMixin, DetailView):
-    model = Recipe
-    context_object_name = 'recipe'
-
-    def get_template_names(self):
-        # показывать разные шаблоны в зависимости от залогинен ли пользователь
-        if self.request.user.is_authenticated:
-            return ['recipePage.html']
-        return ['singlePage.html']
-
-
-class FavoriteView(LoginRequiredMixin, RecipeObjectMixin, ListView):
-    template_name = 'favorite.html'
-    context_object_name = 'recipes'
-    paginate_by = 6
-
-    def get_queryset(self):
-        qs = FollowRecipe.objects.select_related('user', 'recipe').filter(
-            user=self.request.user).order_by('-recipe__pub_date')
-        filters = self.request.GET.getlist('filters')
-
-        if filters:
-            qs = qs.filter(recipe__tags__slug__in=filters).distinct()
-        return qs
-
-
-class ProfileView(RecipeObjectMixin, ListView):
-    template_name = 'authorRecipe.html'
-    context_object_name = 'recipes'
-    paginate_by = 6
-
-    def get_queryset(self):
-        username = self.kwargs.get('username')
-        qs = Recipe.objects.select_related('author').prefetch_related('tags', 'ingredients').filter(
-            author__username=username).order_by('-pub_date')
-        filters = self.request.GET.getlist('filters')
-        if filters:
-            qs = qs.filter(tags__slug__in=filters).distinct()
-        return qs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['profile'] = get_object_or_404(User, username=self.kwargs.get('username'))
-
-        return context
-
-
-class FollowView(LoginRequiredMixin, ListView):
-    template_name = 'myFollow.html'
-    context_object_name = 'following'
-    paginate_by = 3
-
-    def get_queryset(self):
-        qs = FollowUser.objects.select_related('user', 'author').filter(user=self.request.user)
-        return qs
-
-
-class CardView(LoginRequiredMixin, ListView):
-    template_name = 'shopList.html'
-    context_object_name = 'card'
-
-    def get_queryset(self):
-        qs = ShoppingList.objects.select_related('user', 'recipe').filter( user=self.request.user)
-        return qs
-
-
-class RecipeEditView(LoginRequiredMixin, AuthorRequiredMixin, UpdateView):
-    model = Recipe
-    form_class = RecipeForm
-    template_name = 'formChangeRecipe.html'
-
-    def get_success_url(self):
-        return reverse_lazy('recipe_page', kwargs={'pk': self.kwargs['pk']})
-
-
-class RecipeDeleteView(LoginRequiredMixin, AuthorRequiredMixin, DeleteView):
-    template_name = 'recipe_confirm_delete.html'
-    model = Recipe
-    success_url = reverse_lazy('indexAuth')
+def recipes(request):
+    '''
+    Cписок рецептов для всех пользователей
+    '''
+    recipe_list, tags = filter_tag(request)
+    paginator = Paginator(recipe_list, 6)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    template_name = ('indexAuth.html' if request.user.is_authenticated else 'indexNotAuth.html'
+    )
+    return render(request, template_name, {
+            'page': page,
+            'paginator': paginator,
+            'tags': tags,
+        },
+    )
 
 
 @login_required
-def download_card(request):
-    recipes = Recipe.objects.filter(shopping_list__user=request.user)
-    ingredients = recipes.values('ingredients__title', 'ingredients__dimension').annotate(
-        Sum('recipe_ingredients__amount'))
-    file_data = ''
+def new_recipe(request):
+    if request.method == 'POST':
+        form = RecipeForm(request.POST or None, files=request.FILES or None)
+        if form.is_valid():
+            success_save = save_recipe(request, form)
+            if success_save == 400:
+                return redirect('page_bad_request')
+            return redirect('recipes')
+    else:
+        form = RecipeForm(request.POST or None)
+        tags = []
+    return render(request, 'formRecipe.html',
+                  {'form': form, 'tags': tags})
 
-    # Все ингридиенты вида ['молоко', 'мл', 150] парсируются в str и конкатируются в пустой файл с переносом строки
-    for item in ingredients:
-        line = ' '.join(str(value) for value in item.values())
-        file_data += line + '\n'
 
-    response = HttpResponse(file_data, content_type='application/text charset=utf-8')
-    response['Content-Disposition'] = 'attachment; filename="ShoppingList.txt"'
+def recipe_view(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    template_name = (
+        'singlePage.html'
+        if request.user.is_authenticated
+        else 'singlePageNotAuth.html'
+    )
+    return render(request, template_name, {'recipe': recipe})
+
+
+def profile(request, username):
+    recipe_list, tags = filter_tag(request)
+    recipe_list = recipe_list.filter(author__username=username)
+    paginator = Paginator(recipe_list, 6)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    return render(request, 'authorRecipe.html', {
+            'page': page,
+            'paginator': paginator,
+            'username': username,  # возвращаем обратно пришедший username
+            'tags': tags})
+
+
+@login_required
+def recipe_edit(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    if request.user != recipe.author:
+        return redirect('recipe_view', recipe_id=recipe_id)
+    if request.method == 'POST':
+        form = RecipeForm(request.POST or None,
+                          files=request.FILES or None, instance=recipe)
+        if form.is_valid():
+            recipe.ingredient.remove()
+            recipe.recipe_amount.all().delete()
+            recipe.recipe_tag.all().delete()
+            success_save = save_recipe(request, form)
+            if success_save == 400:
+                return redirect('page_bad_request')
+            return redirect('recipe_view', recipe_id=recipe_id)
+    else:
+        tags_saved = recipe.recipe_tag.values_list('title', flat=True)
+        form = RecipeForm(instance=recipe)
+        form.fields['tag'].initial = list(tags_saved)
+        tags = get_tag(tags_saved)
+    return render(
+        request, 'formChangeRecipe.html',
+        {'form': form, 'recipe': recipe, 'tags': tags})
+
+
+@login_required
+def recipe_delete(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    if request.user == recipe.author:
+        recipe.delete()
+        return redirect('profile', username=request.user.username)
+    return redirect('recipes')
+
+
+@login_required
+def favorites(request):
+    recipe_list, tags = filter_tag(request)
+    recipe_list = recipe_list.filter(recipe_favorite__user=request.user)
+    paginator = Paginator(recipe_list, 6)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    return render(request, 'favorite.html', {
+        'page': page,
+        'paginator': paginator,
+        'tags': tags})
+
+
+@login_required
+def purchases(request):
+    recipe_list, tags = filter_tag(request)
+    recipe_list = recipe_list.filter(recipe_purchase__user=request.user)
+    return render(
+        request, 'shopList.html',
+        {'recipe_list': recipe_list, 'tags': tags})
+
+
+@login_required
+def subscriptions(request):
+    author_list = User.objects.prefetch_related(
+        'recipe_author'
+            ).filter(
+        following__user=request.user)
+    paginator = Paginator(author_list, 6)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    return render(
+        request, 'myFollow.html',
+        {'page': page, 'paginator': paginator})
+
+
+def get_ingredients(request):
+    ingredient_list = Recipe.objects.prefetch_related(
+        'ingredient', 'recipe_amount'
+            ).filter(
+        recipe_purchase__user=request.user
+            ).order_by(
+        'ingredient__title'
+            ).values(
+        'ingredient__title', 'ingredient__dimension'
+            ).annotate(
+        amount=Sum('recipe_amount__amount'))
+    ingredient_txt = [
+        (f"\u2022 {item['ingredient__title'].capitalize()} "
+         f"({item['ingredient__dimension']}) \u2014 {item['amount']} \n")
+        for item in ingredient_list
+    ]
+    filename = 'ingredients.txt'
+    response = HttpResponse(ingredient_txt, content_type='text/plain')
+    response['Content-Disposition'] = f'attachment; filename={filename}'
     return response
 
 
+@requires_csrf_token
 def page_not_found(request, exception):
-    return render(request, 'misc/404.html', {'path': request.path}, status=404)
+    return render(request, "error/404.html", {"path": request.path}, status=404)
 
 
+@requires_csrf_token
 def server_error(request):
-    return render(request, 'misc/500.html', status=500)
+    return render(request, "error/500.html", status=500)
+
+@requires_csrf_token
+def page_bad_request(request, exception):
+    return render(request, "error/400.html", {"path": request.path}, status=400)
