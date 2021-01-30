@@ -1,13 +1,13 @@
 from django.urls import path
 
-from . import views
+from api import views
 
 urlpatterns = [
-    path('ingredients/', views.IngredientAPIView.as_view()),
-    path('favorites/', views.FavoriteAdd.as_view()),
-    path('favorites/<int:id>/', views.FavoriteDelete.as_view()),
-    path('purchases/', views.PurchaseAdd.as_view()),
-    path('purchases/<int:id>/', views.PurchaseDelete.as_view()),
-    path('subscriptions/', views.SubscribeAdd.as_view()),
-    path('subscriptions/<int:id>/', views.SubscribeDelete.as_view()),
+    path('v1/ingredients/', views.IngredientAPIView.as_view()),
+    path('v1/favorites/', views.FavoriteCreateView.as_view()),
+    path('v1/favorites/<int:recipe_id>/', views.FavoriteDeleteView.as_view()),
+    path('v1/purchases/', views.PurchaseCreateView.as_view()),
+    path('v1/purchases/<int:recipe_id>/', views.PurchaseDeleteView.as_view()),
+    path('v1/subscriptions/', views.SubscribeCreateView.as_view()),
+    path('v1/subscriptions/<int:author_id>/', views.SubscribeDeleteView.as_view()),
 ]

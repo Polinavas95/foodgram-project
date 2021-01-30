@@ -1,12 +1,9 @@
 from django.contrib import admin, auth
 
-from .models import User
+from users.models import User
 
 
 class Admin(auth.admin.UserAdmin):
-    '''
-    Expand functionality in admin site.
-    '''
     list_filter = ('username', 'email', )
     search_fields = ('^username', '^email', )
     ordering = ('username', )

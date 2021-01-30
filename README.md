@@ -1,2 +1,2 @@
 # foodgram-project
-Рецептурная база
+foodgram-project

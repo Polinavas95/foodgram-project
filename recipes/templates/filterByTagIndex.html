@@ -3,45 +3,54 @@
         <a  id="breakfast"
             class="tags__checkbox tags__checkbox_style_orange 
                 {% if 'b' in tags %}tags__checkbox_active{% endif %}" 
-            href="{% if 'b' in tags %}{% url 'recipes:index' %}?tags={{ tags|cut:'b' }}
-                {% else %}{% url 'recipes:index' %}?tags={{ tags|add:'b' }}{% endif %}">
+            href="{% if 'b' in tags %}{% url request.resolver_match.url_name %}?tags={{ tags|cut:'b' }}
+                {% else %}{% url request.resolver_match.url_name %}?tags={{ tags|add:'b' }}{% endif %}">
         </a>
         <span class="tags__label">Завтрак</span>
     </li>
     <li class="tags__item">
-        <a  id="lunch" 
+        <a  id="dinner"
             class="tags__checkbox tags__checkbox_style_orange
                 {% if 'd' in tags %}tags__checkbox_active{% endif %}" 
-            href="{% if 'd' in tags %}{% url 'recipes:index' %}?tags={{ tags|cut:'d' }}
-                {% else %}{% url 'recipes:index' %}?tags={{ tags|add:'d' }}{% endif %}">
+            href="{% if 'd' in tags %}{% url request.resolver_match.url_name %}?tags={{ tags|cut:'d' }}
+                {% else %}{% url request.resolver_match.url_name %}?tags={{ tags|add:'d' }}{% endif %}">
         </a>
         <span for="lunch" class="tags__label">Обед</span>
     </li>
     <li class="tags__item">
-        <a  id="dinner" 
+        <a  id="supper"
             class="tags__checkbox tags__checkbox_style_orange
                 {% if 's' in tags %}tags__checkbox_active{% endif %}" 
-            href="{% if 's' in tags %}{% url 'recipes:index' %}?tags={{ tags|cut:'s' }}
-                {% else %}{% url 'recipes:index' %}?tags={{ tags|add:'s' }}{% endif %}">
+            href="{% if 's' in tags %}{% url request.resolver_match.url_name %}?tags={{ tags|cut:'s' }}
+                {% else %}{% url request.resolver_match.url_name %}?tags={{ tags|add:'s' }}{% endif %}">
         </a>
         <label for="dinner" class="tags__label">Ужин</label>
     </li>
     <li class="tags__item">
-        <a  id="dinner"
+        <a  id="lunch"
             class="tags__checkbox tags__checkbox_style_green
                 {% if 'l' in tags %}tags__checkbox_active{% endif %}"
-            href="{% if 'l' in tags %}{% url 'recipes:index' %}?tags={{ tags|cut:'l' }}
-                {% else %}{% url 'recipes:index' %}?tags={{ tags|add:'l' }}{% endif %}">
+            href="{% if 'l' in tags %}{% url request.resolver_match.url_name %}?tags={{ tags|cut:'l' }}
+                {% else %}{% url request.resolver_match.url_name %}?tags={{ tags|add:'l' }}{% endif %}">
         </a>
         <label for="dinner" class="tags__label">Перекус</label>
     </li>
     <li class="tags__item">
-        <a  id="dinner"
+        <a  id="dessert"
             class="tags__checkbox tags__checkbox_style_purple
-                {% if 'des' in tags %}tags__checkbox_active{% endif %}"
-            href="{% if 'des' in tags %}{% url 'recipes:index' %}?tags={{ tags|cut:'des' }}
-                {% else %}{% url 'recipes:index' %}?tags={{ tags|add:'des' }}{% endif %}">
+                {% if 't' in tags %}tags__checkbox_active{% endif %}"
+            href="{% if 't' in tags %}{% url request.resolver_match.url_name %}?tags={{ tags|cut:'t' }}
+                {% else %}{% url request.resolver_match.url_name %}?tags={{ tags|add:'t' }}{% endif %}">
         </a>
         <label for="dinner" class="tags__label">Десерт</label>
     </li>
 </ul>
+<div >
+tttttttttttttttttttttttttttttttttttt
+    {% for recipe in recipes %}
+        Автор: {{ recipe.author }} <br>
+        Описание: {{ recipe.duration }}
+        Картинка: {{ recipe.image }}
+    {% endfor %}
+</div>
+{{ recipes.all }}

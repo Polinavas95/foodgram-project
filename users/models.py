@@ -4,6 +4,4 @@ from django.utils.translation import gettext_lazy as _
 
 
 class User(AbstractUser):
-
-    # email required
     email = models.EmailField(_('email address'), unique=True)
