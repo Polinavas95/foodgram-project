@@ -10,7 +10,7 @@ from users.models import User
 
 from recipes.forms import RecipeForm
 from recipes.models import Recipe
-from recipes.utils import filter_tag, get_ingredients, get_tag, save_recipe
+from recipes.utils import filter_tag, get_tag, save_recipe
 
 
 @cache_page(20, key_prefix='index_page')
@@ -20,6 +20,8 @@ def index(request):
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     context = {'page': page, 'paginator': paginator, 'tags': tags, }
+    print('recipe_list', recipe_list)
+    print('tags', tags)
     template_name = ('indexAuth.html' if request.user.is_authenticated else 'indexNotAuth.html')
 
     return render(request, template_name, context)
@@ -66,7 +68,7 @@ def recipe_edit(request, recipe_id):
         if form.is_valid():
             recipe.ingredient.remove()
             recipe.recipe_amount.all().delete()
-            recipe.tag.all().delete()
+            recipe.recipe_tag.all().delete()
             success_save = save_recipe(request, form)
             if success_save == 400:
                 return redirect('page_bad_request')

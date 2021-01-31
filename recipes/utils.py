@@ -5,10 +5,11 @@ from recipes.models import Ingredient, RecipeIngredient, Recipe, Tag
 
 
 def filter_tag(request):
+    '''
+    Список рецептов в зависимости от тега
+    '''
     tags = request.GET.get('tags', 'bdslt')
-    recipe_list = Recipe.objects.prefetch_related('author', 'tag').filter(tag__slug__in=tags).distinct()
-    contex = {'recipe_list': recipe_list, 'tags': tags}
-    print(recipe_list, tags)
+    recipe_list = Recipe.objects.prefetch_related('author', 'recipe_tag').filter(recipe_tag__slug__in=tags).distinct()
     return recipe_list, tags
 
 
