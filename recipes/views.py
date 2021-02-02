@@ -50,11 +50,14 @@ def new_recipe(request):
         if form.is_valid():
             success_save = save_recipe(request, form)
             if success_save == 400:
+                print('400 form', form)
                 return redirect('page_bad_request')
             return redirect('index')
     form = RecipeForm(request.POST or None)
     tags = []
     context = {'form': form, 'tags': tags}
+    print('else form', form)
+    print('else tags', tags)
     return render(request, 'formRecipe.html', context)
 
 
@@ -68,7 +71,7 @@ def recipe_edit(request, recipe_id):
         if form.is_valid():
             recipe.ingredient.remove()
             recipe.recipe_amount.all().delete()
-            recipe.recipe_tag.all().delete()
+            recipe.recipes_tag.all().delete()
             success_save = save_recipe(request, form)
             if success_save == 400:
                 return redirect('page_bad_request')

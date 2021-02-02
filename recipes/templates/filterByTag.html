@@ -15,7 +15,7 @@
             href="{% if 'd' in tags %}{% url request.resolver_match.url_name username %}?tags={{ tags|cut:'d' }}
                 {% else %}{% url request.resolver_match.url_name username %}?tags={{ tags|add:'d' }}{% endif %}">
         </a>
-        <span for="lunch" class="tags__label">Обед</span>
+        <span for="dinner" class="tags__label">Обед</span>
     </li>
     <li class="tags__item">
         <a  id="supper"
@@ -24,7 +24,7 @@
             href="{% if 's' in tags %}{% url request.resolver_match.url_name username %}?tags={{ tags|cut:'s' }}
                 {% else %}{% url request.resolver_match.url_name username %}?tags={{ tags|add:'s' }}{% endif %}">
         </a>
-        <label for="dinner" class="tags__label">Ужин</label>
+        <label for="supper" class="tags__label">Ужин</label>
     </li>
     <li class="tags__item">
         <a  id="lunch"
@@ -33,7 +33,7 @@
             href="{% if 'l' in tags %}{% url request.resolver_match.url_name username %}?tags={{ tags|cut:'l' }}
                 {% else %}{% url request.resolver_match.url_name username %}?tags={{ tags|add:'l' }}{% endif %}">
         </a>
-        <label for="dinner" class="tags__label">Перекус</label>
+        <label for="lunch" class="tags__label">Закуски</label>
     </li>
     <li class="tags__item">
         <a  id="dessert"
@@ -42,6 +42,6 @@
             href="{% if 't' in tags %}{% url request.resolver_match.url_name username %}?tags={{ tags|cut:'t' }}
                 {% else %}{% url request.resolver_match.url_name username %}?tags={{ tags|add:'t' }}{% endif %}">
         </a>
-        <label for="dinner" class="tags__label">Десерт</label>
+        <label for="dessert" class="tags__label">Десерты</label>
     </li>
 </ul>

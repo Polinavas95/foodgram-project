@@ -11,17 +11,12 @@ class RecipeForm(forms.ModelForm):
         ('Завтрак', 'b'),
         ('Обед', 'd'),
         ('Ужин', 's'),
-        ('Перекус', 'l'),
-        ('Десерт', 'des')
+        ('Закуски', 'l'),
+        ('Десерты', 't')
     )
-    tag = forms.MultipleChoiceField(
-        widget=forms.CheckboxSelectMultiple,
-        choices=TAG_CHOICES,
-    )
-    text = forms.CharField(
-        widget=forms.Textarea(attrs={'class': 'form__textarea'})
-    )
+    tag = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=TAG_CHOICES)
+    text = forms.CharField(widget=forms.Textarea(attrs={'class': 'form__textarea'}))
 
     class Meta:
         model = Recipe
-        fields = ('title', 'tag', 'duration', 'text', 'image')
+        fields = ('title', 'duration', 'text', 'image')

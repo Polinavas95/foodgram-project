@@ -18,7 +18,7 @@ def get_tag(tags):
         'Завтрак': 'b',
         'Обед': 'd',
         'Ужин': 's',
-        'Перекус': 'l',
+        'Закуски': 'l',
         'Десерт': 't'
     }
     return [tag_dict[item] for item in tags]
@@ -31,9 +31,10 @@ def save_recipe(request, form):
             recipe.author = request.user
             recipe.save()
 
-            # tags = form.cleaned_data['tag']
-            # for tag in tags:
-            #     Tag.objects.create(recipe=recipe, title=tag)
+            tags = form.cleaned_data['tag']
+            print('tags', tags)
+            for tag in tags:
+                Tag.objects.create(recipe=recipe, title=tag)
 
             objs = []
             for key, value in form.data.items():

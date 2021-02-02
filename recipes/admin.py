@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.db.models import Count
-from recipes.models import Ingredient, Recipe, RecipeIngredient, Tag
+
+from .models import Ingredient, RecipeIngredient, Recipe, Tag
 
 
 class IngredientAmountInline(admin.TabularInline):
@@ -19,7 +20,10 @@ class TagInline(admin.TabularInline):
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     inlines = (IngredientAmountInline, TagInline)
-    list_display = ('id', 'title', 'author', 'image_img', 'duration', 'get_tag',)
+    list_display = (
+        'id', 'title', 'author', 'get_favorite',
+        'image_img', 'duration', 'get_tag',
+    )
     list_filter = ('author', 'recipe_tag__title', )
     search_fields = ('title', 'author__username', )
     autocomplete_fields = ('author', )
@@ -32,7 +36,12 @@ class RecipeAdmin(admin.ModelAdmin):
     def get_tag(self, obj):
         return list(obj.recipe_tag.values_list('title', flat=True))
 
+    def get_favorite(self, obj):
+        return obj._get_favorite
+
     get_tag.short_description = 'теги'
+    get_favorite.short_description = 'добавлен в избранное, раз'
+    get_favorite.admin_order_field = '_get_favorite'
 
 
 @admin.register(Ingredient)

@@ -9,30 +9,13 @@ from api.models import Favorite, Subscribe, Purchase
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-    id = serializers.SlugRelatedField(
-        slug_field='id', queryset=Recipe.objects.all(), source='recipe'
-    )
-    user = serializers.PrimaryKeyRelatedField(
-        read_only=True, default=serializers.CurrentUserDefault()
-    )
+    id = serializers.SlugRelatedField(slug_field='id', queryset=Recipe.objects.all(), source='recipe')
+    user = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
 
     class Meta:
         fields = ['id', 'user']
         model = Favorite
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Favorite.objects.all(),
-                fields=['id', 'user']
-            )
-        ]
-
-    def validate_id(self, value):
-        user = self.context['request'].user
-        if user == value.author:
-            raise ValidationError(
-                'Вы не можете добавить в избранное свой рецепт'
-            )
-        return value
+        validators = [UniqueTogetherValidator(queryset=Favorite.objects.all(), fields=['id', 'user'])]
 
     def create(self, validated_data):
         if 'user' not in validated_data:
@@ -41,12 +24,8 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
 
 class PurchaseSerializer(serializers.ModelSerializer):
-    id = serializers.SlugRelatedField(
-        slug_field='id', queryset=Recipe.objects.all(), source='recipe'
-    )
-    user = serializers.PrimaryKeyRelatedField(
-        read_only=True, default=serializers.CurrentUserDefault()
-    )
+    id = serializers.SlugRelatedField(slug_field='id', queryset=Recipe.objects.all(), source='recipe')
+    user = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
 
     class Meta:
         fields = ['id', 'user']
@@ -65,12 +44,8 @@ class PurchaseSerializer(serializers.ModelSerializer):
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
-    id = serializers.SlugRelatedField(
-        slug_field='id', queryset=User.objects.all(), source='author'
-    )
-    user = serializers.PrimaryKeyRelatedField(
-        read_only=True, default=serializers.CurrentUserDefault()
-    )
+    id = serializers.SlugRelatedField(slug_field='id', queryset=User.objects.all(), source='author')
+    user = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
 
     class Meta:
         fields = ['id', 'user']
@@ -81,12 +56,6 @@ class SubscribeSerializer(serializers.ModelSerializer):
                 fields=['id', 'user']
             )
         ]
-
-    def validate_id(self, value):
-        user = self.context['request'].user
-        if user == value:
-            raise ValidationError('Вы не можете подписаться на себя')
-        return value
 
     def create(self, validated_data):
         if 'user' not in validated_data:
