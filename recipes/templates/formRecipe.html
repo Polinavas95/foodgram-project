@@ -1,10 +1,10 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 {% block title %}Создание рецепта{% endblock %}
 {% block css %}
 <link rel="stylesheet" href="{% static 'pages/form.css' %}">
 {% endblock %}
-{% block header %}{%include 'headerAuth.html' %}{% endblock %}
+{% block header %}{% include 'includes/headerAuth.html' %}{% endblock %}
 {% block content %}
 {% load user_filters %}
     <div class="main__header">
@@ -108,7 +108,7 @@
             <div class="form__group">
                 <span class="form__label">Загрузить фото</span>
                 <div class="form__field-group">
-                    {{ form.image|addclass:"form__file-button"  }}
+                    {{ form.image|addclass:"form__file-button" }}
                     <span class="form__error">{{ error|escape }}</span>
                 </div>
             </div>

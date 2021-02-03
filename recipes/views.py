@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Sum
@@ -22,7 +21,8 @@ def index(request):
     context = {'page': page, 'paginator': paginator, 'tags': tags, }
     print('recipe_list', recipe_list)
     print('tags', tags)
-    template_name = ('indexAuth.html' if request.user.is_authenticated else 'indexNotAuth.html')
+    template_name = ('indexAuth.html'
+                     if request.user.is_authenticated else 'indexNotAuth.html')
 
     return render(request, template_name, context)
 
@@ -33,13 +33,15 @@ def profile(request, username):
     paginator = Paginator(recipe_list, 6)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    context = {'page': page, 'paginator': paginator, 'username': username, 'tags': tags, }
+    context = {'page': page, 'paginator': paginator,
+               'username': username, 'tags': tags, }
     return render(request, 'authorRecipe.html', context)
 
 
 def recipe_view(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id)
-    template_name = ('singlePage.html' if request.user.is_authenticated else 'singlePageNotAuth.html')
+    template_name = ('singlePage.html'
+                     if request.user.is_authenticated else 'singlePageNotAuth.html')
     return render(request, template_name, {'recipe': recipe})
 
 
@@ -117,7 +119,8 @@ def purchases(request):
 
 @login_required
 def subscriptions(request):
-    author_list = User.objects.prefetch_related('recipe_author').filter(following__user=request.user)
+    author_list = User.objects.prefetch_related(
+        'recipe_author').filter(following__user=request.user)
     paginator = Paginator(author_list, 6)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -129,9 +132,11 @@ def download(request):
     """
      Отправление файла с ингредиентами
     """
-    ingredient_list = Recipe.objects.prefetch_related('ingredient', 'recipe_amount').filter(
-        recipe_purchase__user=request.user).order_by('ingredient__title').values(
-        'ingredient__title', 'ingredient__dimension').annotate(amount=Sum('recipe_amount__amount'))
+    ingredient_list = Recipe.objects.prefetch_related(
+        'ingredient', 'recipe_amount').filter(
+        recipe_purchase__user=request.user).order_by(
+        'ingredient__title').values('ingredient__title', 'ingredient__dimension'
+                                    ).annotate(amount=Sum('recipe_amount__amount'))
     ingredient_txt = [(f'\u2022 {item["ingredient__title"].capitalize()} '
                        f'({item["ingredient__dimension"]}) \u2014 {item["amount"]} \n')
                       for item in ingredient_list]
@@ -142,11 +147,13 @@ def download(request):
 
 
 def page_bad_request(request, exception):
-    return render(request, 'error/400.html', {'path': request.path}, status=400)
+    return render(request, 'error/400.html',
+                  {'path': request.path}, status=400)
 
 
 def page_not_found(request, exception):
-    return render(request, 'error/404.html', {'path': request.path}, status=404)
+    return render(request, 'error/404.html',
+                  {'path': request.path}, status=404)
 
 
 def server_error(request):

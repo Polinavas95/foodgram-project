@@ -1,14 +1,14 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 {% block title %}{{ recipe.title }}{% endblock %}
 {% block css %}
     <link rel="stylesheet" href="{% static 'pages/single.css' %}">
 {% endblock %}
-    {% block header %}{%include 'headerNotAuth.html' %}{% endblock %}
+    {% block header %}{% include 'includes/headerNotAuth.html' %}{% endblock %}
     {% block content %}
         <div class="single-card" data-id="{{ recipe.id }}">
             {% load thumbnail %}
-            {% thumbnail recipe.image "960x500" as im %}
+            {% thumbnail recipe.image '960x500' as im %}
             <img src="{{ im.url }}" alt="Картинка" class="single-card__image">
             <div class="single-card__info">
                 <div class="single-card__header-info">

@@ -1,5 +1,4 @@
 from django.contrib import admin, auth
-
 from users.models import User
 
 

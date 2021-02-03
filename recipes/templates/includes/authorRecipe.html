@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 {% block title %}Рецепты{% endblock %}
 {% block css %}
@@ -6,9 +6,9 @@
 {% endblock %}
     {% block header %}
         {% if request.user.is_authenticated %}
-            {%include 'headerAuth.html' %}
+            {% include 'headerAuth.html' %}
         {% else %}
-            {%include 'headerNotAuth.html' %}
+            {% include 'headerNotAuth.html' %}
         {% endif %}
     {% endblock %}
     {% block content %}
@@ -29,7 +29,7 @@
         <div class="card-list" >
     {% load thumbnail %}
     {% for recipe in page %}
-    {% thumbnail recipe.image "960x500" crop="center" as im %}
+    {% thumbnail recipe.image '960x500' crop='center' as im %}
     <div class="card" data-id="{{ recipe.id }}">
         <a href="{% url 'recipe_view' recipe.id %}" class="link"><img src="{{ im.url }}" alt="Картинка" class="card__image"></a>
         <div class="card__body">
@@ -66,7 +66,7 @@
     {% endfor %}
     </div>
     {% if page.has_other_pages %}
-        {% include "paginator.html" with items=page paginator=paginator tags=tags%}
+        {% include "paginator.html" with items=page paginator=paginator tags=tags %}
     {% endif %}
 {% endblock content %}
 {% block style %}

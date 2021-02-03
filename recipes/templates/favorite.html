@@ -1,20 +1,20 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 {% block title %}Избранное{% endblock %}
 {% block css %}
 <link rel="stylesheet" href="{% static 'pages/index.css' %}">
 {% endblock %}
-{% block header %}{%include 'headerAuth.html' %}{% endblock %}
+{% block header %}{% include 'includes/headerAuth.html' %}{% endblock %}
 {% block content %}
     {% load user_filters %}
 <div class="main__header">
     <h1 class="main__title">Избранное</h1>
-    {% include 'filterByTagIndex.html' %}
+    {% include 'includes/filterByTagIndex.html' %}
 </div>
 <div class="card-list">
     {% load thumbnail %}
     {% for recipe in page %}
-    {% thumbnail recipe.image "960x500" crop="center" as im %}
+    {% thumbnail recipe.image '960x500' crop='center' as im %}
     <div class="card" data-id="{{ recipe.id }}">
         <a href="{% url 'recipe_view' recipe.id %}" class="link"><img src="{{ im.url }}" alt="Картинка" class="card__image"></a>
         <div class="card__body">
@@ -49,7 +49,7 @@
     {% endfor %}
 </div>
 {% if page.has_other_pages %}
-    {% include "paginator.html" with items=page paginator=paginator tags=tags%}
+    {% include 'includes/paginator.html' with items=page paginator=paginator tags=tags %}
 {% endif %}
 {% endblock content %}
 {% block style %}

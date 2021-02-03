@@ -1,6 +1,5 @@
 from decimal import Decimal
 from django.db import IntegrityError, transaction
-
 from recipes.models import Ingredient, RecipeIngredient, Recipe, Tag
 
 
@@ -9,7 +8,8 @@ def filter_tag(request):
     Список рецептов в зависимости от тега
     '''
     tags = request.GET.get('tags', 'bdslt')
-    recipe_list = Recipe.objects.prefetch_related('author', 'recipe_tag').filter(recipe_tag__slug__in=tags).distinct()
+    recipe_list = Recipe.objects.prefetch_related(
+        'author', 'recipe_tag').filter(recipe_tag__slug__in=tags).distinct()
     return recipe_list, tags
 
 
@@ -32,7 +32,6 @@ def save_recipe(request, form):
             recipe.save()
 
             tags = form.cleaned_data['tag']
-            print('tags', tags)
             for tag in tags:
                 Tag.objects.create(recipe=recipe, title=tag)
 

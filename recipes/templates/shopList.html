@@ -1,10 +1,10 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 {% block title %}Список покупок{% endblock %}
 {% block css %}
 <link rel="stylesheet" href="{% static 'pages/shopList.css' %}">
 {% endblock %}
-{% block header %}{%include 'headerAuth.html' %}{% endblock %}
+{% block header %}{% include 'includes/headerAuth.html' %}{% endblock %}
 {% block content %}
 <div class="main__header">
     <h1 class="main__title">Список покупок</h1>
@@ -13,7 +13,7 @@
     <ul class="shopping-list">
         {% load thumbnail %}
         {% for recipe in recipe_list %}
-        {% thumbnail recipe.image "960x500" crop="center" as im %}
+        {% thumbnail recipe.image '960x500' crop='center' as im %}
         <li class="shopping-list__item" data-id="{{ recipe.id }}">
             <div class="recipe recipe_reverse">
                 <img src="{{ im.url }}" alt="Картинка" class="recipe__image recipe__image_big">

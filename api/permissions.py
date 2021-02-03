@@ -1,8 +1,18 @@
-from rest_framework.permissions import SAFE_METHODS, BasePermission
+from rest_framework.permissions import BasePermission
+from rest_framework import permissions
 
 
-class IsOwnerOrAdmin(BasePermission):
+class OwnResourcePermission(BasePermission):
+
     def has_object_permission(self, request, view, obj):
-        if request.method in SAFE_METHODS or request.user.is_superuser:
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return request.user == obj.author
+
+
+class SubscribePermission(BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
             return True
         return request.user == obj.user

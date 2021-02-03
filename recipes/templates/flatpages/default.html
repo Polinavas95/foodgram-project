@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 {% block title %}{{ flatpage.title }}{% endblock %}
 {% block css %}
@@ -6,9 +6,9 @@
 {% endblock %}
 {% block header %}
     {% if request.user.is_authenticated %}
-        {%include 'headerAuth.html' %}
+        {% include 'headerAuth.html' %}
     {% else %}
-        {%include 'headerNotAuth.html' %}
+        {% include 'headerNotAuth.html' %}
     {% endif %}
 {% endblock %}
 {% block content %}

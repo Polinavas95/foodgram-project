@@ -1,31 +1,46 @@
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
 from recipes.models import Ingredient, Recipe
 from users.models import User
 
-from api.models import Favorite, Subscribe, Purchase
+from .models import Favorite, Purchase, Subscribe
+
+
+class RecipeSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        many=False,
+        read_only=True,
+        slug_field='username'
+    )
+
+    class Meta:
+        model = Recipe
+        fields = '__all__'
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-    id = serializers.SlugRelatedField(slug_field='id', queryset=Recipe.objects.all(), source='recipe')
-    user = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
+    id = serializers.SlugRelatedField(
+        slug_field='id', queryset=Recipe.objects.all(), source='recipe')
+    user = serializers.PrimaryKeyRelatedField(
+        read_only=True, default=serializers.CurrentUserDefault())
 
     class Meta:
         fields = ['id', 'user']
         model = Favorite
-        validators = [UniqueTogetherValidator(queryset=Favorite.objects.all(), fields=['id', 'user'])]
-
-    def create(self, validated_data):
-        if 'user' not in validated_data:
-            validated_data['user'] = self.context['request'].user
-        return Favorite.objects.create(**validated_data)
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Favorite.objects.all(),
+                fields=['id', 'user']
+            )
+        ]
 
 
 class PurchaseSerializer(serializers.ModelSerializer):
-    id = serializers.SlugRelatedField(slug_field='id', queryset=Recipe.objects.all(), source='recipe')
-    user = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
+    id = serializers.SlugRelatedField(
+        slug_field='id', queryset=Recipe.objects.all(), source='recipe')
+    user = serializers.PrimaryKeyRelatedField(
+        read_only=True, default=serializers.CurrentUserDefault())
 
     class Meta:
         fields = ['id', 'user']
@@ -37,15 +52,12 @@ class PurchaseSerializer(serializers.ModelSerializer):
             )
         ]
 
-    def create(self, validated_data):
-        if 'user' not in validated_data:
-            validated_data['user'] = self.context['request'].user
-        return Purchase.objects.create(**validated_data)
-
 
 class SubscribeSerializer(serializers.ModelSerializer):
-    id = serializers.SlugRelatedField(slug_field='id', queryset=User.objects.all(), source='author')
-    user = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
+    id = serializers.SlugRelatedField(
+        slug_field='id', queryset=User.objects.all(), source='author')
+    user = serializers.PrimaryKeyRelatedField(
+        read_only=True, default=serializers.CurrentUserDefault())
 
     class Meta:
         fields = ['id', 'user']
@@ -57,14 +69,8 @@ class SubscribeSerializer(serializers.ModelSerializer):
             )
         ]
 
-    def create(self, validated_data):
-        if 'user' not in validated_data:
-            validated_data['user'] = self.context['request'].user
-        return Subscribe.objects.create(**validated_data)
-
 
 class IngredientSerializer(serializers.ModelSerializer):
-
     class Meta:
         fields = '__all__'
         model = Ingredient
