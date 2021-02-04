@@ -6,13 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('recipes', '0001_initial'),
+        ("recipes", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='tag',
-            name='title',
-            field=models.CharField(choices=[('Завтрак', 'Завтрак'), ('Обед', 'Обед'), ('Ужин', 'Ужин'), ('Закуски', 'Закуски'), ('Десерты', 'Десерты')], max_length=50, verbose_name='Название'),
+            model_name="tag",
+            name="title",
+            field=models.CharField(
+                choices=[
+                    ("Завтрак", "Завтрак"),
+                    ("Обед", "Обед"),
+                    ("Ужин", "Ужин"),
+                    ("Закуски", "Закуски"),
+                    ("Десерты", "Десерты"),
+                ],
+                max_length=50,
+                verbose_name="Название",
+            ),
         ),
     ]
