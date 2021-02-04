@@ -5,14 +5,14 @@ from users.models import User
 
 class Admin(auth.admin.UserAdmin):
     list_filter = (
-        "username",
-        "email",
+        'username',
+        'email',
     )
     search_fields = (
-        "^username",
-        "^email",
+        '^username',
+        '^email',
     )
-    ordering = ("username",)
+    ordering = ('username',)
 
 
 admin.site.register(User, Admin)

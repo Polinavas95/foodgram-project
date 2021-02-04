@@ -4,15 +4,15 @@ from api.models import Favorite, Purchase, Subscribe
 
 
 class FavoriteAdmin(admin.ModelAdmin):
-    list_display = ("user", "recipe")
+    list_display = ('user', 'recipe')
 
 
 class SubscribeAdmin(admin.ModelAdmin):
-    list_display = ("user", "author")
+    list_display = ('user', 'author')
 
 
 class PurchaseAdmin(admin.ModelAdmin):
-    list_display = ("user", "recipe")
+    list_display = ('user', 'recipe')
 
 
 admin.site.register(Favorite, FavoriteAdmin)

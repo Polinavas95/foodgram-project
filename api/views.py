@@ -31,7 +31,7 @@ class IngredientViewSet(PerformCreateMixin, viewsets.ModelViewSet):
     serializer_class = IngredientSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, FoodgramPermission)
     filter_backends = [filters.SearchFilter]
-    search_fields = ["^title"]
+    search_fields = ['^title']
 
 
 class PurchaseViewSet(PerformCreateMixin, viewsets.ModelViewSet):
@@ -47,4 +47,4 @@ class SubscribeViewSet(
     serializer_class = SubscribeSerializer
     permission_classes = (FoodgramPermission,)
     filter_backends = (filters.SearchFilter,)
-    search_fields = ["=user__username", "=following__username"]
+    search_fields = ['=user__username', '=following__username']
