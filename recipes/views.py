@@ -19,8 +19,6 @@ def index(request):
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     context = {'page': page, 'paginator': paginator, 'tags': tags, }
-    print('recipe_list', recipe_list)
-    print('tags', tags)
     template_name = ('indexAuth.html'
                      if request.user.is_authenticated else 'indexNotAuth.html')
 
@@ -55,14 +53,11 @@ def new_recipe(request):
         if form.is_valid():
             success_save = save_recipe(request, form)
             if success_save == 400:
-                print('400 form', form)
                 return redirect('page_bad_request')
             return redirect('index')
     form = RecipeForm(request.POST or None)
     tags = []
     context = {'form': form, 'tags': tags}
-    print('else form', form)
-    print('else tags', tags)
     return render(request, 'formRecipe.html', context)
 
 

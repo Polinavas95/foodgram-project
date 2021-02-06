@@ -1,24 +1,30 @@
-version: '3.8'
+version: '3.9'
 
 volumes:
   postgres_data:
   staticfiles:
+  media:
 
 services:
   db:
     image: postgres:12.4
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    ports:
+    - 5432:5432
     env_file:
       - ./.env
 
   web:
-    build: .
+    image: lytkin/foodgram:v1.02.2021
     restart: always
     volumes:
-      - staticfiles:/code/static/
+      - staticfiles:/code/static
+      - media:/code/media
     depends_on:
       - db
+    ports:
+    - 9000:9000
     env_file:
       - ./.env
 
@@ -26,6 +32,9 @@ services:
     image: nginx:1.19.5
     volumes:
       - staticfiles:/static
-      - ./nginx:/etc/nginx/conf.d
+      - media:/media
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+    - 80:80
     depends_on:
       - web
