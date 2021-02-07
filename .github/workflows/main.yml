@@ -42,7 +42,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: polik/oodgram.v1:latest
+          tags: polik/foodgram.v1:latest
 
   deploy:
     runs-on: ubuntu-latest
