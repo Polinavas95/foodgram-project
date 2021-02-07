@@ -75,6 +75,16 @@ application/json
     }
 ]
 ```
+## Running the tests
+
+The project uses a workflow file yamdb_workflow.yaml for automated testing after the git push command.
+
+# go-rest-service-example
+
+![yamdb_workflow](https://github.com/Polinavas95/foodgram-project/workflows/foodgram/badge.svg)
+
+Site
+[Foodgram helper](http://84.252.129.196/recipes)
 
 ## Deployment
 
