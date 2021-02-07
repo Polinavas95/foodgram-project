@@ -9,5 +9,6 @@ urlpatterns = [
     path('v1/purchases/', views.PurchaseCreateView.as_view()),
     path('v1/purchases/<int:recipe_id>/', views.PurchaseDeleteView.as_view()),
     path('v1/subscriptions/', views.SubscribeCreateView.as_view()),
-    path('v1/subscriptions/<int:author_id>/', views.SubscribeDeleteView.as_view()),
+    path('v1/subscriptions/<int:author_id>/',
+         views.SubscribeDeleteView.as_view()),
 ]
