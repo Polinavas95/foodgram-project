@@ -23,7 +23,8 @@ jobs:
       run: black .
 
     - name: Test with pytest
-      run: python -m pytest tests/test_favorite.py tests/test_purchase.py tests/test_recipes.py tests/test_subscribe.py
+      run: pytest
+#      run: python -m pytest tests/test_favorite.py tests/test_purchase.py tests/test_recipes.py tests/test_subscribe.py
 
   build_and_push_to_docker_hub:
     name: Push Docker image to Docker Hub
