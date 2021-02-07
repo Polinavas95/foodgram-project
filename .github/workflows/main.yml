@@ -16,13 +16,14 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install black pytest
+        pip install black
+        pip3 install pytest
         pip install -r requirements.txt
     - name: Lint with black
       run: black .
 
-#    - name: Test with pytest
-#      run: python -m pytest tests/test_favorite.py tests/test_purchase.py tests/test_recipes.py tests/test_subscribe.py
+    - name: Test with pytest
+      run: python -m pytest tests/test_favorite.py tests/test_purchase.py tests/test_recipes.py tests/test_subscribe.py
 
   build_and_push_to_docker_hub:
     name: Push Docker image to Docker Hub
