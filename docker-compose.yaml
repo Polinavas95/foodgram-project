@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3.8'
 
 volumes:
   postgres_data:
@@ -16,7 +16,7 @@ services:
       - ./.env
 
   web:
-    image: lytkin/foodgram:v1.02.2021
+    image: polik/foodgram.v1
     restart: always
     volumes:
       - staticfiles:/code/static
