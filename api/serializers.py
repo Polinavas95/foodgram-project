@@ -1,20 +1,10 @@
+from rest_framework.exceptions import ValidationError
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from recipes.models import Ingredient, Recipe
 from users.models import User
-
-from .models import Favorite, Purchase, Subscribe
-
-
-class RecipeSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        many=False, read_only=True, slug_field='username'
-    )
-
-    class Meta:
-        model = Recipe
-        fields = '__all__'
+from recipes.models import Ingredient, Recipe
+from api.models import Favorite, Purchase, Subscribe
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
@@ -34,6 +24,19 @@ class FavoriteSerializer(serializers.ModelSerializer):
             )
         ]
 
+    def validate(self, attrs):
+        user = self.context['request'].user
+        if user == attrs['recipe'].author:
+            raise ValidationError(
+                'Нельзя добавить в избранное свой собственный рецепт'
+            )
+        return attrs
+
+    def create(self, validated_data):
+        if 'user' not in validated_data:
+            validated_data['user'] = self.context['request'].user
+        return Favorite.objects.create(**validated_data)
+
 
 class PurchaseSerializer(serializers.ModelSerializer):
     id = serializers.SlugRelatedField(
@@ -52,6 +55,11 @@ class PurchaseSerializer(serializers.ModelSerializer):
             )
         ]
 
+    def create(self, validated_data):
+        if 'user' not in validated_data:
+            validated_data['user'] = self.context['request'].user
+        return Purchase.objects.create(**validated_data)
+
 
 class SubscribeSerializer(serializers.ModelSerializer):
     id = serializers.SlugRelatedField(
@@ -69,6 +77,17 @@ class SubscribeSerializer(serializers.ModelSerializer):
                 queryset=Subscribe.objects.all(), fields=['id', 'user']
             )
         ]
+
+    def validate(self, attrs):
+        user = self.context['request'].user
+        if user == attrs['author']:
+            raise ValidationError('Нельзя подписаться на себя')
+        return attrs
+
+    def create(self, validated_data):
+        if 'user' not in validated_data:
+            validated_data['user'] = self.context['request'].user
+        return Subscribe.objects.create(**validated_data)
 
 
 class IngredientSerializer(serializers.ModelSerializer):

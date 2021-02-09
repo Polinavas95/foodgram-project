@@ -1,9 +1,10 @@
-from rest_framework import permissions
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
-class FoodgramPermission(BasePermission):
+class IsOwnerOrAdmin(BasePermission):
     def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        return request.user == obj.author
+        return (
+            request.method in SAFE_METHODS or
+            request.user.is_superuser or
+            request.user == obj.user
+        )
