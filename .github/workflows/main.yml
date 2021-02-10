@@ -51,8 +51,8 @@ jobs:
    - name: executing remote ssh commands to deploy
      uses: appleboy/ssh-action@master
      with:
-       host: 84.252.130.89
-       username: ${{ secrets.USER }}
+       host: ${{ secrets.HOST }}
+       username: polly
        key: ${{ secrets.SSH_KEY }}
        script: |
          sudo docker pull polik/foodgram-project.v1
