@@ -53,7 +53,7 @@ jobs:
      with:
        host: ${{ secrets.HOST }}
        username: ${{ secrets.USER }}
-       key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC9Dex/Gjc9waKx/MdTyG1VkJQN1cy2e0i3G7L6v98y9M9/AFDgz8SJ+OAAXmFVRiDwMyFLgTs9o7riNnnfxGXL8AALCONu+C2NqbxPbgW7qdgthN3Dgkp/tWW5Tag+/vUeY+EC1O4Yt4sJ4SarpbkFzPaXh63uIrvwt2Uz55a1Dom8aWwmBdqgnU2H676T35UA5iL6IofskoPbUtsVxYr1wymMZ00DjAL/Pg4U8fkuL7Xi7cQBczNreeQJFeW8YDCtjF6Hg6tuDnJxnDRWp8kKV/RjrbCCpTuAwe7WUQUMEXQrBrnQGV7M4bOfF3nlcKbEwr7LciL9pKQJL6RLurZJBzZ3UmbDE4RgXTiWAv+MSPLIxwFje/60GJi5z/KYdTZhdOeHi4ZMaV7tSnuhVSAzIDdHOpV+abrhMfaR4Ox5TcrC4kkc2li5aQXaxLBTH5RpW/RgSWKLO1b7DiE1YWtNtN5GUeYH3tKGkH1Vw6Eg/Xx6IxYc+GHI6vabQpjg9KM= dasha@dasha-desktop
+       key: ${{ secrets.SSH_KEY }}
        script: |
          sudo docker pull polik/foodgram-project.v1
          sudo docker-compose up -d
