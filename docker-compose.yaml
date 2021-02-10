@@ -18,8 +18,8 @@ services:
     image: polik/foodgram-project.v1
     restart: always
     volumes:
-      - staticfiles:/app/static
-      - media:/app/media
+      - staticfiles:/code/static
+      - media:/code/media
     depends_on:
       - db
     env_file:
@@ -28,8 +28,8 @@ services:
   nginx:
     image: nginx:1.19.5
     volumes:
-      - staticfiles:/app/static
-      - media:/app/media
+      - staticfiles:/code/static
+      - media:/code/media
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     ports:
     - 80:80
