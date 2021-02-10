@@ -1,7 +1,6 @@
 FROM python:3.9.1
-WORKDIR /code
-COPY ./requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-CMD gunicorn foodgram.wsgi:application --bind 0.0.0.0:8000
 
+WORKDIR /code
+COPY . /code
+RUN pip install -r requirements.txt
+CMD gunicorn foodgram.wsgi:application --bind 0.0.0.0:9000

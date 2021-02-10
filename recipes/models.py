@@ -4,28 +4,34 @@ from django.utils.safestring import mark_safe
 
 from users.models import User
 
+from recipes.validators import validate_file_size
+
 
 class Recipe(models.Model):
+    """ORM-модель 'Рецепт'."""
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='author_recipes',
-        verbose_name='Автор',
+        related_name='recipes',
+        verbose_name='Автор'
     )
-    title = models.CharField(max_length=200, verbose_name='Название', blank=False)
-    duration = models.PositiveSmallIntegerField(
-        verbose_name='Время приготовления', validators=[MinValueValidator(1)]
+    title = models.CharField(max_length=100, verbose_name='Название')
+    duration = models.SmallIntegerField(verbose_name='Время приготовления')
+    text = models.TextField(verbose_name='Описание')
+    pub_date = models.DateTimeField(
+        auto_now_add=True, verbose_name='Дата публикации'
     )
-    text = models.TextField(verbose_name='Описание', blank=False)
-    pub_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата публикации')
-    image = models.ImageField(upload_to='images/', verbose_name='Изображение')
-    ingredient = models.ManyToManyField(
-        'Ingredient',
-        through='RecipeIngredient',
-        related_name='ingredients',
-        verbose_name='Ингредиенты',
+    image = models.ImageField(
+        upload_to="recipe_images/",
+        validators=[validate_file_size],
+        verbose_name='Изображение'
     )
-    slug = models.SlugField('Уникальное имя', default='', editable=False, max_length=32)
+    ingredients = models.ManyToManyField(
+        "Ingredient",
+        related_name="ingredients",
+        through="IngredientAmount",
+        verbose_name='Ингредиенты'
+    )
 
     class Meta:
         verbose_name = 'Рецепт'
@@ -35,37 +41,100 @@ class Recipe(models.Model):
     def __str__(self):
         return self.title
 
-    @property
-    def favorite_count(self):
-        return self.recipe_amount.count()
-
     def image_img(self):
         if self.image:
-            return mark_safe(f'<img width="90" height="50" src="{self.image.url}" />')
+            return mark_safe(
+                f'<img width="90" height="50" src="{self.image.url}" />'
+            )
         return 'Без изображения'
 
-    image_img.short_description = 'изображение'
+    image_img.short_description = 'Изображение'
 
 
-class Tag(models.Model):
-    TAG_CHOICES = (
-        ('Завтрак', 'Завтрак'),
-        ('Обед', 'Обед'),
-        ('Ужин', 'Ужин'),
-        ('Закуски', 'Закуски'),
-        ('Десерты', 'Десерты'),
+class Ingredient(models.Model):
+    """ORM-модель 'Ингредиент'."""
+    title = models.CharField(max_length=100, verbose_name='Название')
+    dimension = models.CharField(
+        max_length=16, verbose_name='Eдиница измерения'
     )
 
-    title = models.CharField(
-        max_length=50, choices=TAG_CHOICES, verbose_name='Название'
+    class Meta:
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'dimension'], name='unique_ingredients'
+            )
+        ]
+        ordering = ('title',)
+
+    def __str__(self):
+        return f'{self.title}, {self.dimension}'
+
+
+class IngredientAmount(models.Model):
+    """ORM-модель 'Рецепт - Ингредиент'."""
+    ingredient = models.ForeignKey(
+        Ingredient, on_delete=models.CASCADE, verbose_name='Ингредиент'
     )
-    color = models.CharField(max_length=50, editable=False, verbose_name='Цвет')
-    slug = models.SlugField(max_length=50, editable=False, verbose_name='Адрес')
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        verbose_name='рецепт',
-        related_name='recipe_tag',
+        related_name='quantity',
+        verbose_name='Рецепт'
+    )
+    amount = models.DecimalField(
+        max_digits=6,
+        decimal_places=1,
+        validators=[MinValueValidator(0, 1)],
+        verbose_name='Количество'
+    )
+
+    class Meta:
+        verbose_name = 'Количество ингредиента'
+        verbose_name_plural = 'Количество ингредиентов'
+
+
+class Tag(models.Model):
+    """ORM-модель 'Тег'."""
+    COLOR_ORANGE = 'orange'
+    COLOR_GREEN = 'green'
+    COLOR_PURPLE = 'purple'
+
+    SLUG_BREAKFAST = 'b'
+    SLUG_LUNCH = 'l'
+    SLUG_DINNER = 'd'
+
+    TITLE_BREAKFAST_RU = 'Завтрак'
+    TITLE_LUNCH_RU = 'Обед'
+    TITLE_DINNER_RU = 'Ужин'
+
+    TITLE_BREAKFAST_EN = 'breakfast'
+    TITLE_LUNCH_EN = 'lunch'
+    TITLE_DINNER_EN = 'dinner'
+
+    TITLE = (
+        (TITLE_BREAKFAST_RU, TITLE_BREAKFAST_RU),
+        (TITLE_LUNCH_RU, TITLE_LUNCH_RU),
+        (TITLE_DINNER_RU, TITLE_DINNER_RU)
+    )
+
+    title = models.CharField(
+        max_length=50, choices=TITLE, verbose_name='Название'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='tags',
+        verbose_name='Рецепт',
+    )
+    slug = models.SlugField(
+        default='', editable=False, max_length=50, verbose_name='Адрес')
+    color = models.CharField(
+        max_length=50,
+        default='',
+        editable=False,
+        verbose_name='Цвет'
     )
 
     class Meta:
@@ -75,70 +144,18 @@ class Tag(models.Model):
     def __str__(self):
         return self.title
 
-    def _generate_slug_and_colour(self):
+    def _generate_color_and_slug(self):
         value = self.title
-        self.slug = ''
-        self.color = ''
-        if value == 'Ужин':
-            self.slug = 's'
-            self.color = 'orange'
-        if value == 'Обед':
-            self.slug = 'd'
-            self.color = 'orange'
-        if value == 'Ужин':
-            self.slug = 'b'
-            self.color = 'orange'
-        elif value == 'Закуски':
-            self.slug = 'l'
-            self.color = 'green'
+        if value == self.TITLE_BREAKFAST_RU:
+            self.color = self.COLOR_ORANGE
+            self.slug = self.SLUG_BREAKFAST
+        elif value == self.TITLE_LUNCH_RU:
+            self.color = self.COLOR_GREEN
+            self.slug = self.SLUG_LUNCH
         else:
-            self.slug = 't'
-            self.color = 'purple'
+            self.color = self.COLOR_PURPLE
+            self.slug = self.SLUG_DINNER
 
     def save(self, *args, **kwargs):
-        self._generate_slug_and_colour()
+        self._generate_color_and_slug()
         super().save(*args, **kwargs)
-
-
-class Ingredient(models.Model):
-    title = models.CharField(
-        max_length=200, db_index=True, unique=True, verbose_name='Название'
-    )
-    dimension = models.CharField(max_length=200, verbose_name='Eдиница измерения')
-
-    def __str__(self):
-        return f'{self.title}, {self.dimension}'
-
-    class Meta:
-        verbose_name = 'Ингредиент'
-        verbose_name_plural = 'Ингредиенты'
-
-
-class RecipeIngredient(models.Model):
-    """
-    Показывает количество ингредиента,
-    необходимое для данного рецепта
-    """
-
-    ingredient = models.ForeignKey(
-        Ingredient, on_delete=models.CASCADE, verbose_name='Ингредиент'
-    )
-    amount = models.DecimalField(
-        max_digits=6,
-        decimal_places=1,
-        validators=[MinValueValidator(1)],
-        verbose_name='Количество',
-    )
-    recipe = models.ForeignKey(
-        Recipe,
-        on_delete=models.CASCADE,
-        related_name='recipes_amount',
-        verbose_name='Рецепт',
-    )
-
-    class Meta:
-        verbose_name = 'Рецепт - Ингредиент'
-        verbose_name_plural = 'Рецепты - Ингредиенты'
-
-    def __str__(self):
-        return f'Из рецепта "{self.recipe}"'

@@ -1,32 +1,42 @@
 import os
 from pathlib import Path
 
+import environ
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = '63n5v%_kz!mj3l4o5&82xy27-qe43w+%y3zjw95yt8omikr8+-'
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-DEBUG = True
+SECRET_KEY = '3n5v%_kz!mj3l4o5&82xy27-qe43w+%y3zjw95yt8omikr8+-'
 
-ALLOWED_HOSTS = ['*']
+DEBUG = False
+
+ALLOWED_HOSTS = [
+    '178.154.235.251',
+    'localhost',
+    '127.0.0.1',
+    '0.0.0.0',
+]
 
 AUTH_USER_MODEL = 'users.User'
 
-# Application definition
-
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.sites',
-    'django.contrib.flatpages',
-    'rest_framework',
-    'sorl.thumbnail',
-    'api',
-    'users',
-    'recipes',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.sites",
+    "django.contrib.flatpages",
+    "recipes.apps.RecipesConfig",
+    "users.apps.UsersConfig",
+    "api.apps.ApiConfig",
+    "about.apps.AboutConfig",
+    "rest_framework",
+    "sorl.thumbnail",
 ]
 
 MIDDLEWARE = [
@@ -46,15 +56,15 @@ TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [TEMPLATES_DIR],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'foodgram.context_processors.purchase_counter',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'foodgram.context_processors.purchase_counter',
             ],
         },
     },
@@ -88,9 +98,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
-# https://docs.djangoproject.com/en/3.1/topics/i18n/
-
 LANGUAGE_CODE = 'ru-Ru'
 
 TIME_ZONE = 'Europe/Moscow'
@@ -111,25 +118,22 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 SITE_ID = 1
 
 LOGIN_URL = '/auth/login/'
-LOGIN_REDIRECT_URL = 'index'
-LOGOUT_REDIRECT_URL = 'index'
+LOGOUT_URL = '/auth/logout'
+LOGIN_REDIRECT_URL = 'recipes'
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 DEFAULT_FROM_EMAIL = 'auth@foodgram.ru'
 
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 100
 }
 
-RECIPES_COUNT = 6
+RECIPES_ON_PAGE = 6
 
 if DEBUG:
     INSTALLED_APPS += ['debug_toolbar', ]
-    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware',]
+    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
     INTERNAL_IPS = ['127.0.0.1', ]

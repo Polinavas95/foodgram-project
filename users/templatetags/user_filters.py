@@ -11,15 +11,15 @@ def addclass(field, css):
 
 
 @register.filter
-def is_subscribe(value, user):
-    return Subscribe.objects.filter(author=value, user=user).exists()
-
-
-@register.filter
-def is_favorite(value, user):
+def in_favorites(value, user):
     return Favorite.objects.filter(recipe=value, user=user).exists()
 
 
 @register.filter
-def is_purchase(value, user):
+def in_shopping_list(value, user):
     return Purchase.objects.filter(recipe=value, user=user).exists()
+
+
+@register.filter
+def in_subscription(value, user):
+    return Subscribe.objects.filter(author=value, user=user).exists()
