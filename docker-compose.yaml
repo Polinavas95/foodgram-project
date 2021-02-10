@@ -16,7 +16,7 @@ services:
       - ./.env
 
   web:
-    image: lytkin/foodgram:v1.02.2021
+    image: polik/foodgram-project.v1
     restart: always
     volumes:
       - staticfiles:/code/static
