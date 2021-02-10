@@ -16,11 +16,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install black pytest
+        pip install flake8 pytest
         pip install -r requirements.txt
-    - name: Lint with black
+    - name: Lint with flake8
       run: flake8 . --exclude tests,api/migrations,recipes/migrations,users/migrations,foodgram/settings.py
-
     - name: Test with pytest
       run: pytest
 
