@@ -11,7 +11,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 SECRET_KEY = '3n5v%_kz!bk3l4o5&82uc27-qe43w+%y3zjw95yt8omikr8+-'
 
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     '84.252.130.89',
@@ -105,12 +105,20 @@ USE_L10N = True
 
 USE_TZ = True
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static_dev'), )
+STATIC_URL = '/static_dev/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static_dev')
+# STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static_dev'), )
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+if DEBUG:
+    STATICFILES_DIRS = [
+        os.path.join(BASE_DIR, 'static_dev')
+    ]
+
+else:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static_dev')
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 SITE_ID = 1
 
