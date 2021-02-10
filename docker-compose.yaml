@@ -13,7 +13,7 @@ services:
     env_file:
       - ./.env
   web:
-    build: .
+    image: polik/foodgram-project.v1
     restart: always
     volumes:
       - staticfiles:/app/static/
