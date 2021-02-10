@@ -14,11 +14,7 @@ SECRET_KEY = '3n5v%_kz!bk3l4o5&82uc27-qe43w+%y3zjw95yt8omikr8+-'
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    '84.252.130.89',
-    '84.252.129.196',
-    'localhost',
-    '127.0.0.1',
-    '0.0.0.0',
+    '*'
 ]
 
 AUTH_USER_MODEL = 'users.User'
