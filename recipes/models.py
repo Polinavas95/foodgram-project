@@ -16,7 +16,7 @@ class Recipe(models.Model):
         verbose_name='Автор'
     )
     title = models.CharField(max_length=100, verbose_name='Название')
-    duration = models.SmallIntegerField(verbose_name='Время приготовления')
+    duration = models.PositiveIntegerField(verbose_name='Время приготовления')
     text = models.TextField(verbose_name='Описание')
     pub_date = models.DateTimeField(
         auto_now_add=True, verbose_name='Дата публикации'
