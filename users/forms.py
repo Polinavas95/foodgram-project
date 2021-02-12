@@ -12,21 +12,6 @@ class CreationForm(UserCreationForm):
         model = User
         fields = ('first_name', 'last_name', 'username', 'email')
 
-    def save(self, commit=True):
-        user = super(CreationForm, self).save(commit=False)
-        user.username = self.cleaned_data['username']
-        user.first_name = self.cleaned_data['first_name']
-        user.last_name = self.cleaned_data['last_name']
-        user.email = self.cleaned_data['email']
-
-        user.set_password(self.cleaned_data['password1'])
-        message = "Пожалуйста пройдите по ссылке ниже"
-        send_mail(self, message, from_email=settings.EMAIL_HOST_USER, recipient_list=user.email)
-        # Save this session without saving in database
-        if commit:
-            user.save()
-        return user
-
     def send_mail(self, request, **kwargs):
         subject = "Для заверешния регистрации подтвердите почту"
 
@@ -39,8 +24,9 @@ class CreationForm(UserCreationForm):
                               from_email=settings.EMAIL_HOST,
                               auth_user=request.user.email,
                               auth_password=request.user.password,
-                              recipient_list=self.recipient,
+                              recipient_list=[self.recipient],
                               fail_silently=False)
+                    print('Сообщение отправлено!')
                 return render(request, self.template_name)
             except user.DoesNotExist:
                 return redirect('password_reset')

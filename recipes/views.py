@@ -177,5 +177,5 @@ def get_ingredients(request):
 
     filename = "ingredients.txt"
     response = HttpResponse(text, content_type="text/plain")
-    response["Content-Disposition"] = f"attachment; filename={filename}"
+    response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
     return response
