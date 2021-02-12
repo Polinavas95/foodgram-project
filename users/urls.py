@@ -5,13 +5,7 @@ from users import views
 
 urlpatterns = [
     path('signup/', views.SignUp.as_view(), name='signup'),
-    path(
-        'login/',
-        auth_view.LoginView.as_view(
-            template_name='authForm.html'
-        ),
-        name='login'
-    ),
+    path('login/', views.user_login, name='login'),
     path(
         'logout/',
         auth_view.LogoutView.as_view(
