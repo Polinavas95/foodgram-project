@@ -19,7 +19,7 @@ jobs:
         pip install black pytest
         pip install -r requirements.txt
     - name: Lint with black
-      run: black . --exclude tests, api/migrations, recipes/migrations, users/migrations, foodgram/settings.py
+      run: black .
     - name: Test with pytest
       run: pytest
 
