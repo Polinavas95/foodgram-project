@@ -11,7 +11,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 SECRET_KEY = '3n5v%_kz!bk3l4o5&82uc27-qe43w+%y3zjw95yt8omikr8+-'
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     '*'
@@ -143,12 +143,3 @@ if DEBUG:
     INSTALLED_APPS += ['debug_toolbar', ]
     MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
     INTERNAL_IPS = ['127.0.0.1', ]
-
-
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'tetst333@gmail.ru'
-EMAIL_HOST_PASSWORD = 'PolinaVas'
-DEFAULT_FROM_EMAIL = 'Polina'
-DEFAULT_TO_EMAIL = 'tatsuchan@mail.ru'
