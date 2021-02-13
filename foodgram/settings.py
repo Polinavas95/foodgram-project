@@ -70,13 +70,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('POSTGRES_USER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT'),
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
 }
 
@@ -127,8 +123,7 @@ LOGOUT_URL = '/auth/logout'
 LOGIN_REDIRECT_URL = 'recipes'
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
-DEFAULT_FROM_EMAIL = 'auth@foodgram.ru'
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'send_email')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -143,8 +138,11 @@ if DEBUG:
     MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware', ]
     INTERNAL_IPS = ['127.0.0.1', ]
 
+
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'tatsuchan@mail.ru'
-EMAIL_HOST_PASSWORD = 'password'
 EMAIL_PORT = 587
+EMAIL_HOST_USER = 'tatsuchan@mail.ru'
+EMAIL_HOST_PASSWORD = os.environ.get('GMAIL_PASSWORD')
+DEFAULT_FROM_EMAIL = 'Polina'
+DEFAULT_TO_EMAIL = 'tatsuchan@mail.ru'
