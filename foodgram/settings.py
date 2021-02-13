@@ -142,7 +142,7 @@ if DEBUG:
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'tatsuchan@mail.ru'
+EMAIL_HOST_USER = 'tetst333@gmail.ru'
 EMAIL_HOST_PASSWORD = os.environ.get('GMAIL_PASSWORD')
 DEFAULT_FROM_EMAIL = 'Polina'
 DEFAULT_TO_EMAIL = 'tatsuchan@mail.ru'
