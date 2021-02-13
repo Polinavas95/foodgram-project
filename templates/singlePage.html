@@ -37,7 +37,9 @@
                 <ul class="single-card__items">
                     <li class="single-card__item"><p class="single-card__text"><span class="icon-user"></span>{{ recipe.author.get_full_name }}</p></li>
                     {% if request.user.is_authenticated and request.user == recipe.author %}
-                    <li class="single-card__item">  <a style="margin-left: 2.5em" href="{% url 'recipe_edit' recipe.id %}" class="single-card__text">Редактировать рецепт</a></li>
+                        <li class="single-card__item">  <a style="margin-left: 2.5em" href="{% url 'recipe_edit' recipe.id %}" class="single-card__text">Редактировать рецепт</a></li>
+                    {% elif request.user.is_authenticated and request.user != recipe.author %}
+                        <li class="single-card__item"> <a href="{% url 'profile' recipe.author %}" class="card-user__link link">Страница автора</a></li>
                     {% endif %}
                 </ul>
             </div>
